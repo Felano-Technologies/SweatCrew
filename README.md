@@ -116,16 +116,3 @@ MIT License – [Open Source](LICENSE)
 
 
 ---
-
-### ℹ️ **About Section (for website/About page)**
-
-```txt
-SweatCrew is built for communities that thrive on movement, accountability, and mutual motivation. Whether you're just starting your fitness journey or you're a weekend warrior, SweatCrew helps you stay on track by logging your workouts, joining challenges, and cheering each other on.
-
-🏃‍♀️ Log workouts daily  
-🔥 Join or create fun fitness challenges  
-🥇 Compete on leaderboards  
-🤝 Build a fitness tribe
-
-Together, we sweat better. 💪
-
