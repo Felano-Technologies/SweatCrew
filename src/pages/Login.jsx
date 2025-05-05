@@ -1,9 +1,10 @@
-// src/pages/Login.jsx
 import React, { useRef, useState } from 'react'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '../contexts/AuthContext'
 import { Link, useNavigate } from 'react-router-dom'
-import logo from '../assets/images/logo2.png'
+import logo from '../assets/images/logo.png'
+import Footer from '../components/Footer'
+import Navbar from '../components/Navbar' 
 
 export default function Login() {
   const emailRef = useRef()
@@ -20,7 +21,7 @@ export default function Login() {
       setError('')
       setLoading(true)
       await login(emailRef.current.value, pwRef.current.value)
-      navigate('/')
+      navigate('/dashboard')
     } catch {
       setError('Failed to sign in')
     } finally {
@@ -30,29 +31,21 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      
-      {/* Header (full-width) */}
-      <nav className="w-full bg-white shadow-sm">
-        <div className="flex items-center px-8 py-4">
-        <span className="text-2xl font-bold tracking-widest">SweatCrew</span>
-        </div>
-       </nav>
+      {/* Navbar */}
+      <Navbar />
 
-      {/* Main (relative!) */}
-      <div className="flex-grow flex items-center justify-center px-4 relative">
-        {/* Badge */}
-        <div className="absolute top-30 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <div className="bg-white p-0 rounded-full shadow-md">
-            <img
-              src={logo}
-              alt="SweatCrew Logo"
-              className="h-50 w-50 rounded-full"
+      {/* Main Content */}
+      <div className="flex-grow flex items-center justify-center px-4">
+        <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-lg mt-12">
+          {/* Logo inside the form */}
+          <div className="flex justify-center mb-6">
+            <img 
+              src={logo} 
+              alt="SweatCrew Logo" 
+              className="h-32 w-32 object-contain" 
             />
           </div>
-        </div>
-
-        {/* Card (pushed down) */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-sm mt-12">
+          
           <h2 className="text-center text-2xl font-semibold mb-6">LOG IN</h2>
 
           {error && (
@@ -86,12 +79,12 @@ export default function Login() {
                 required
                 className="w-full bg-gray-100 placeholder-gray-400 text-gray-900 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
-                <button
-                  type="button"
-                  onClick={() => setShowPw(!showPw)}
-                  className="absolute right-2 top-1/2 transform -translate-y--1.5 flex items-center text-gray-500"
-                  tabIndex={-1}
-                >
+              <button
+                type="button"
+                onClick={() => setShowPw(!showPw)}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500"
+                tabIndex={-1}
+              >
                 {showPw ? (
                   <EyeSlashIcon className="h-5 w-5" />
                 ) : (
@@ -103,7 +96,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-gray-400 text-white font-semibold rounded-lg hover:bg-gray-500 transition"
+              className="w-full py-3 bg-[#087E8B] text-white font-semibold rounded-lg hover:bg-[#4a5c57] transition"
             >
               {loading ? 'Logging In…' : 'LOG IN'}
             </button>
@@ -130,25 +123,8 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-white py-4">
-        <div className="max-w-4xl mx-auto px-6 flex justify-between text-sm text-gray-600">
-          <div className="flex items-center">
-            <span className="font-bold tracking-widest">SweatCrew</span>
-          </div>
-          <div className="space-x-6">
-            <a href="#" className="hover:underline">
-              Manage cookies
-            </a>
-            <a href="#" className="hover:underline">
-              Terms of Use
-            </a>
-            <a href="#" className="hover:underline">
-              Privacy Policy
-            </a>
-          </div>
-        </div>
-      </footer>
+      {/* Footer Component */}
+      <Footer />
     </div>
   )
 }

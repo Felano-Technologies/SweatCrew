@@ -1,4 +1,3 @@
-// src/App.jsx
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
@@ -7,13 +6,15 @@ import Signup               from './pages/Signup'
 import Login                from './pages/Login'
 import Dashboard            from './pages/Dashboard'
 import LogWorkout           from './pages/LogWorkout'
-import PersonalizeProfile   from './pages/PersonalizeProfile'  // fixed path
+import PersonalizeProfile   from './pages/PersonalizeProfile'
+import LandingPage         from './pages/LandingPage'
 
 export default function App() {
   return (
     <Router>
       <AuthProvider>
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login"  element={<Login />} />
 
@@ -33,10 +34,10 @@ export default function App() {
                 <PersonalizeProfile />
               </ProtectedRoute>
             }
-          />  {/* ← properly closed */}
+          />  
 
           <Route
-            path="/"
+            path="/dashboard"
             element={
               <ProtectedRoute>
                 <Dashboard />
