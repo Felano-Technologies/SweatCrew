@@ -76,7 +76,6 @@ sweatcrew/
 
 ---
 
-````md
 
 ## 🛠️ Setup Instructions
 
@@ -84,7 +83,7 @@ sweatcrew/
    ```bash
    git clone https://github.com/yourusername/sweatcrew.git
    cd sweatcrew
-````
+
 
 2. Install dependencies:
 
@@ -114,7 +113,7 @@ sweatcrew/
 
 MIT License – [Open Source](LICENSE)
 
-````
+
 
 ---
 
@@ -129,4 +128,4 @@ SweatCrew is built for communities that thrive on movement, accountability, and 
 🤝 Build a fitness tribe
 
 Together, we sweat better. 💪
-````
+
