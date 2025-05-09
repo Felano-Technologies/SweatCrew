@@ -6,6 +6,7 @@ import Signup               from './pages/Signup'
 import Login                from './pages/Login'
 import Dashboard            from './pages/Dashboard'
 import PersonalizeProfile   from './pages/PersonalizeProfile'
+import Profile   from './pages/Profile'
 import LandingPage         from './pages/LandingPage'
 import Coaches              from './pages/Coaches'
 import Challenges              from './pages/Challenges'
@@ -30,6 +31,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <PersonalizeProfile />
+              </ProtectedRoute>
+            }
+          />  
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             }
           />  

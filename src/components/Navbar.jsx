@@ -83,9 +83,9 @@ export default function Navbar() {
             <NavLinks />
             {user ? (
               <>
-                <Link to="/profile" className="text-gray-700 hover:text-[#087E8B] text-sm font-medium">
+                {/* <Link to="/profile" className="text-gray-700 hover:text-[#087E8B] text-sm font-medium">
                   My Profile
-                </Link>
+                </Link> */}
                 <button
                   onClick={handleLogout}
                   className="text-left text-sm text-red-600 hover:text-red-800"
