@@ -187,7 +187,7 @@ const Coaches = () => {
       </section>
 
       {bookCoach && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 backdrop-blur-sm bg-white/10 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
             <h3 className="text-xl font-semibold text-center text-[#087E8B] mb-4">
               Book Session with {bookCoach.name}

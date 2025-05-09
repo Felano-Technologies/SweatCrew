@@ -1,17 +1,17 @@
 // src/components/MetricsCards.jsx
 import React from 'react'
-import {
-  ArrowUpIcon,
-  ClockIcon,
-  ChartBarIcon,
-  CheckBadgeIcon
-} from '@heroicons/react/24/solid'
+import { ClockIcon, ChartBarIcon, ArrowUpIcon, CheckBadgeIcon } from '@heroicons/react/24/solid'
 
 export default function MetricsCards({ workouts }) {
+  // Calculate total sessions, total duration, unique active days, and average session
   const total = workouts.length
   const totalDuration = workouts.reduce((sum, w) => sum + (w.duration || 0), 0)
   const uniqueDays = new Set(workouts.map(w => w.date)).size
   const avgSession = total ? Math.round(totalDuration / total) : 0
+  const workoutTypes = workouts.reduce((acc, workout) => {
+    acc[workout.type] = (acc[workout.type] || 0) + 1
+    return acc
+  }, {})
 
   const metrics = [
     {
@@ -38,10 +38,10 @@ export default function MetricsCards({ workouts }) {
     {
       title: 'Avg / Session',
       value: avgSession,
-      icon: CheckBadgeIcon,           // ← use CheckBadgeIcon here
+      icon: CheckBadgeIcon,
       iconBg: 'bg-purple-100',
       iconColor: 'text-purple-600'
-    }
+    },
   ]
 
   return (

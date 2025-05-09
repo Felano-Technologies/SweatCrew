@@ -19,7 +19,8 @@ import {
   onSnapshot as onCollectionSnapshot,
   doc,
   onSnapshot as onDocSnapshot,
-  getDocs
+  getDocs,
+  onSnapshot
 } from 'firebase/firestore'
 import { Home } from 'lucide-react'
 
@@ -36,24 +37,17 @@ export default function Dashboard() {
   ])
 
   useEffect(() => {
-    if (!currentUser) return
-    const q = query(
-      collection(db, 'workouts'),
-      where('userId', '==', currentUser.uid),
-      orderBy('createdAt', 'desc')
-    )
-    return onCollectionSnapshot(
-      q,
-      snap => {
-        setWorkouts(snap.docs.map(d => ({ id: d.id, ...d.data() })))
-        setError('')
-      },
-      err => {
-        console.error(err)
-        setError('Couldn’t load workouts.')
-      }
-    )
-  }, [currentUser])
+    if (!currentUser) return;
+  
+    const workoutsRef = collection(db, 'users', currentUser.uid, 'workouts');
+  
+    const unsubscribe = onSnapshot(workoutsRef, (snapshot) => {
+      setWorkouts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+  
+    return () => unsubscribe();
+  }, [currentUser]);
+  
 
   useEffect(() => {
     if (!currentUser) return
@@ -86,7 +80,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-50 text-gray-800">
       <Navbar onLogout={handleLogout} />
 
-      <main className="max-w-7xl mx-auto px-4 py-8 space-y-10">
+      <main className="max-w-7xl mx-auto px-4 py-8 space-y-10 pt-20">
         <h1 className="flex items-center text-3xl font-bold text-[#087E8B] space-x-2">
           <Home className="w-6 h-6" />
           <span>Welcome back, {profile.displayName || 'Friend'}!</span>
