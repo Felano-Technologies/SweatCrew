@@ -2,6 +2,7 @@ import Navbar from "../components/Navbar";
 import logoImage from "../assets/images/logo.png";
 import FAQSection from "../components/FAQSection";
 import Footer from "../components/Footer";
+import { Link } from "react-router-dom";
 
 export default function LandingPage() {
   return (
@@ -25,11 +26,11 @@ export default function LandingPage() {
                 the fitness revolution.
               </p>
 
-              <a href="/signup">
-                <button className="mt-6 bg-[#087E8B] hover:bg-[#56666B] text-white px-6 py-3 rounded-xl text-lg font-semibold shadow-md transition">
+              <Link to="/signup">
+                <div className="mt-6 bg-[#087E8B] hover:bg-[#56666B] text-white px-6 py-3 rounded-xl text-lg font-semibold shadow-md transition text-center">
                   Start Your Journey 💪
-                </button>    
-              </a>
+                </div>
+              </Link>
 
             </div>
 
@@ -148,18 +149,19 @@ export default function LandingPage() {
               SweatCrew. Your journey starts today.
             </p>
             <div className="flex justify-center gap-4 flex-wrap">
-              <a
-                href="/signup"
-                className="bg-white text-[#087E8B] px-6 py-3 rounded-xl font-semibold shadow hover:bg-gray-100 transition"
-              >
-                Get Started
-              </a>
-              <a
-                href="/coaches"
-                className="border border-white text-white px-6 py-3 rounded-xl font-semibold hover:bg-white hover:text-[#087E8B] transition"
-              >
-                Talk to a Coach
-              </a>
+            <Link
+              to="/signup"
+              className="bg-white text-[#087E8B] px-6 py-3 rounded-xl font-semibold shadow hover:bg-gray-100 transition"
+            >
+              Get Started
+            </Link>
+
+            <Link
+              to="/signup"
+              className="border border-white text-white px-6 py-3 rounded-xl font-semibold hover:bg-white hover:text-[#087E8B] transition"
+            >
+              Talk to a Coach
+            </Link>
             </div>
           </div>
         </section>
