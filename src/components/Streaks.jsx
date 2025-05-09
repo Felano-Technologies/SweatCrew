@@ -1,50 +1,65 @@
 import React, { useMemo } from 'react'
-import { differenceInCalendarDays, parseISO } from 'date-fns'
+import { differenceInCalendarDays } from 'date-fns'
+import { Flame } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 export default function Streaks({ workouts }) {
   const { currentStreak, longestStreak } = useMemo(() => {
-    const workoutDates = Array.from(
-      new Set(workouts.map(w => new Date(w.createdAt?.toDate?.() || w.createdAt)))
-    )
-      .sort((a, b) => b - a) // descending
-
-    let currentStreak = 0
-    let longestStreak = 0
-    let prevDate = null
-
-    for (let i = 0; i < workoutDates.length; i++) {
-      const date = workoutDates[i]
-
+    const dates = Array.from(
+      new Set(
+        workouts.map(w =>
+          w.createdAt instanceof Date
+            ? w.createdAt
+            : new Date(w.createdAt)
+        )
+      )
+    ).sort((a, b) => b - a)
+    let curr = 0, longest = 0, prev = null
+    dates.forEach((date, i) => {
       if (i === 0) {
-        if (differenceInCalendarDays(new Date(), date) === 0) {
-          currentStreak = 1
-        }
-        longestStreak = 1
-        prevDate = date
-        continue
+        curr = differenceInCalendarDays(new Date(), date) === 0 ? 1 : 0
+        longest = 1
+        prev = date
+        return
       }
-
-      const diff = differenceInCalendarDays(prevDate, date)
-      if (diff === 1) {
-        currentStreak++
-      } else if (i === 1 && differenceInCalendarDays(new Date(), prevDate) === 0) {
-        // still consider a current streak if today is part of it
-      } else {
-        break // current streak ends
-      }
-
-      longestStreak = Math.max(longestStreak, i + 1)
-      prevDate = date
-    }
-
-    return { currentStreak, longestStreak }
+      const diff = differenceInCalendarDays(prev, date)
+      if (diff === 1) curr++
+      else return
+      longest = Math.max(longest, i + 1)
+      prev = date
+    })
+    return { currentStreak: curr, longestStreak: longest }
   }, [workouts])
 
+  const pct = longestStreak ? (currentStreak / longestStreak) * 100 : 0
+
   return (
-    <div className="bg-white shadow p-6 rounded-lg text-center">
-      <h2 className="text-xl font-semibold text-[#087E8B] mb-4">🔥 Your Streaks</h2>
-      <p className="text-lg text-gray-700">Current streak: <strong>{currentStreak} day{currentStreak !== 1 ? 's' : ''}</strong></p>
-      <p className="text-lg text-gray-700">Longest streak: <strong>{longestStreak} day{longestStreak !== 1 ? 's' : ''}</strong></p>
-    </div>
-  )
+    <motion.div
+      initial={{ opacity: 0, x: 10 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.6, delay: 0.2 }}
+      className="bg-white rounded-2xl shadow-xl ring-1 ring-gray-200 text-center overflow-hidden"
+    >
+      <div className="flex items-center justify-center p-4 border-b">
+        <Flame className="w-6 h-6 text-red-500" />
+        <h3 className="ml-2 text-lg font-semibold">Your Streaks</h3>
+      </div>
+      <div className="p-6 space-y-4">
+        <div>
+          <p className="text-sm text-gray-500">Current</p>
+          <p className="text-2xl font-bold">{currentStreak}</p>
+        </div>
+        <div>
+          <p className="text-sm text-gray-500">Longest</p>
+          <p className="text-2xl font-bold">{longestStreak}</p>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div
+            className="bg-blue-500 h-2 rounded-full"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      </div>
+    </motion.div>
+)
 }

@@ -8,6 +8,8 @@ import Dashboard            from './pages/Dashboard'
 import LogWorkout           from './pages/LogWorkout'
 import PersonalizeProfile   from './pages/PersonalizeProfile'
 import LandingPage         from './pages/LandingPage'
+import Coaches              from './pages/Coaches'
+import Challenges              from './pages/Challenges'
 
 export default function App() {
   return (
@@ -41,6 +43,24 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/coaches"
+            element={
+              <ProtectedRoute>
+                <Coaches />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/challenges"
+            element={
+              <ProtectedRoute>
+                <Challenges />
               </ProtectedRoute>
             }
           />

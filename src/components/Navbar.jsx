@@ -106,18 +106,33 @@ export default function Navbar() {
 }
 
 function NavLinks() {
+
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe();
+  }, []);
   return (
     <>
-      <Link to="#coaches" className="text-gray-700 hover:text-[#087E8B] text-sm font-medium">
+    {user ? (
+      <Link to="/dashboard" className="text-gray-700 hover:text-[#087E8B] text-sm font-medium">
+        Dashboard
+      </Link>
+    ) : null}
+
+      <Link to="/coaches" className="text-gray-700 hover:text-[#087E8B] text-sm font-medium">
         Get a Coach
       </Link>
-      <Link to="#challenges" className="text-gray-700 hover:text-[#087E8B] text-sm font-medium">
+      <Link to="/challenges" className="text-gray-700 hover:text-[#087E8B] text-sm font-medium">
         Challenges
       </Link>
-      <Link to="#track" className="text-gray-700 hover:text-[#087E8B] text-sm font-medium">
+      <Link to="/track" className="text-gray-700 hover:text-[#087E8B] text-sm font-medium">
         Track Progress
       </Link>
-      <Link to="#community" className="text-gray-700 hover:text-[#087E8B] text-sm font-medium">
+      <Link to="/community" className="text-gray-700 hover:text-[#087E8B] text-sm font-medium">
         Join a Crew
       </Link>
     </>
