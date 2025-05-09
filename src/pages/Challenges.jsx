@@ -87,7 +87,7 @@ export default function Challenges() {
 
       {/* Modal */}
       {selectedChallenge && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 px-4">
+        <div className="fixed inset-0 backdrop-blur-sm bg-white/10 flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-lg max-w-lg w-full shadow-xl p-6 relative">
             <button
               className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"

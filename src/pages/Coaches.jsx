@@ -1,153 +1,247 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import {
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  orderBy,
+} from "firebase/firestore";
+import { db } from "../firebase";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import {
-  BriefcaseIcon,
-  StarIcon,
-  UserPlusIcon,
-  CalendarDaysIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import toast from "react-hot-toast";
 
-const dummyCoaches = [
-  {
-    name: "Aarav Mehta",
-    specialty: "Fat Loss & HIIT",
-    experience: "5 years",
-    image: "https://randomuser.me/api/portraits/men/30.jpg",
-    bio: "Certified fitness trainer helping clients burn fat and build endurance through fun, high-energy workouts.",
-    tags: ["HIIT", "Cardio", "Fat Loss"],
-    rating: 4.8,
-  },
-  {
-    name: "Sneha Kapoor",
-    specialty: "Strength & Mobility",
-    experience: "3 years",
-    image: "https://randomuser.me/api/portraits/women/32.jpg",
-    bio: "Helping women become stronger, more flexible, and confident in their bodies through personalized routines.",
-    tags: ["Strength", "Mobility", "Women Fitness"],
-    rating: 4.6,
-  },
-];
-
-export default function Coaches() {
+const Coaches = () => {
+  const [coaches, setCoaches] = useState([]);
+  const [newCoach, setNewCoach] = useState({
+    name: "",
+    specialty: "",
+    experience: "",
+    bio: "",
+    image: "",
+    tags: [],
+    rating: 0,
+  });
   const [showRegister, setShowRegister] = useState(false);
   const [bookCoach, setBookCoach] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const defaultImage = "https://i.imgur.com/rs5KZyz.png";
+
+  useEffect(() => {
+    const q = query(collection(db, "coaches"), orderBy("name"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const coachData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setCoaches(coachData);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleCoachRegister = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const coachRef = collection(db, "coaches");
+      await addDoc(coachRef, {
+        ...newCoach,
+        image: newCoach.image || defaultImage,
+      });
+      toast.success("Coach registered!");
+      setShowRegister(false);
+      setNewCoach({
+        name: "",
+        specialty: "",
+        experience: "",
+        bio: "",
+        image: "",
+        tags: [],
+        rating: 0,
+      });
+    } catch (error) {
+      console.error("Error registering coach: ", error);
+      toast.error("Error registering coach.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBooking = async (e, coachId) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const bookingData = {
+      coachId,
+      fullName: e.target.fullName.value,
+      email: e.target.email.value,
+      date: e.target.date.value,
+      notes: e.target.notes.value || "No additional notes",
+    };
+
+    try {
+      await addDoc(collection(db, "bookings"), bookingData);
+      toast.success("Session booked!");
+      setBookCoach(null);
+    } catch (error) {
+      console.error("Error booking session: ", error);
+      toast.error("Booking failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <>
+    <div>
       <Navbar />
-
-      <div className="pt-24 px-6 max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Meet Our Coaches</h1>
-          <button
-            onClick={() => setShowRegister(true)}
-            className="bg-[#56666B] text-white px-4 py-2 rounded hover:bg-[#44555b] flex items-center gap-2"
-          >
-            <UserPlusIcon className="w-5 h-5" />
-            Register as a Coach
-          </button>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8">
-          {dummyCoaches.map((coach, idx) => (
-            <div
-              key={idx}
-              className="bg-white shadow-md p-6 rounded-xl flex flex-col md:flex-row items-start gap-6"
+      <section className="py-16 px-6 bg-gray-100 min-h-screen">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex justify-between items-center mb-10">
+            <h2 className="text-3xl font-bold text-gray-800">Meet Our Coaches</h2>
+            <button
+              onClick={() => setShowRegister(!showRegister)}
+              className="bg-[#087E8B] text-white px-4 py-2 rounded hover:bg-[#065d64] transition duration-300"
             >
-              <img
-                src={coach.image}
-                alt={coach.name}
-                className="w-24 h-24 rounded-full object-cover"
+              {showRegister ? "Cancel" : "Register as a Coach"}
+            </button>
+          </div>
+
+          {showRegister && (
+            <form
+              onSubmit={handleCoachRegister}
+              className="bg-white p-6 rounded-lg shadow-md mb-10"
+            >
+              <h3 className="text-xl font-semibold mb-4 text-[#087E8B]">Coach Registration</h3>
+              <input
+                type="text"
+                placeholder="Full Name"
+                className="w-full mb-4 p-2 border rounded"
+                value={newCoach.name}
+                onChange={(e) => setNewCoach({ ...newCoach, name: e.target.value })}
+                required
               />
-              <div>
-                <h2 className="text-xl font-semibold">{coach.name}</h2>
-                <p className="text-sm text-gray-600 flex items-center gap-1">
-                  <span className="text-gray-500">{coach.specialty}</span>
-                </p>
-                <p className="text-sm text-gray-500 flex items-center gap-1">
-                  <BriefcaseIcon className="w-4 h-4" />
-                  {coach.experience} Experience
-                </p>
-                <p className="text-sm mt-2 text-gray-700">{coach.bio}</p>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {coach.tags.map((tag, i) => (
-                    <span
-                      key={i}
-                      className="bg-gray-100 text-xs px-2 py-1 rounded-full text-gray-600"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <p className="text-sm text-yellow-600 mt-2 flex items-center gap-1">
-                  <StarIcon className="w-4 h-4" />
-                  {coach.rating} / 5.0
-                </p>
+              <input
+                type="text"
+                placeholder="Specialty (e.g., Cardio, Yoga)"
+                className="w-full mb-4 p-2 border rounded"
+                value={newCoach.specialty}
+                onChange={(e) => setNewCoach({ ...newCoach, specialty: e.target.value })}
+                required
+              />
+              <input
+                type="text"
+                placeholder="Years of Experience"
+                className="w-full mb-4 p-2 border rounded"
+                value={newCoach.experience}
+                onChange={(e) => setNewCoach({ ...newCoach, experience: e.target.value })}
+                required
+              />
+              <textarea
+                placeholder="Short Bio"
+                className="w-full mb-4 p-2 border rounded"
+                value={newCoach.bio}
+                onChange={(e) => setNewCoach({ ...newCoach, bio: e.target.value })}
+                required
+              ></textarea>
+              <input
+                type="url"
+                placeholder="Profile Image URL (optional)"
+                className="w-full mb-4 p-2 border rounded"
+                value={newCoach.image}
+                onChange={(e) => setNewCoach({ ...newCoach, image: e.target.value })}
+              />
+              <button
+                type="submit"
+                className="bg-[#087E8B] text-white px-6 py-2 rounded hover:bg-[#065d64] transition duration-300"
+                disabled={loading}
+              >
+                {loading ? "Submitting..." : "Register Coach"}
+              </button>
+            </form>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+            {coaches.map((coach) => (
+              <div key={coach.id} className="bg-white rounded-lg shadow-md p-6 text-center">
+                <img
+                  src={coach.image || defaultImage}
+                  alt={coach.name}
+                  className="w-24 h-24 rounded-full object-cover mx-auto mb-4"
+                />
+                <h4 className="text-xl font-bold text-gray-800">{coach.name}</h4>
+                <p className="text-gray-600">{coach.specialty}</p>
+                <p className="text-gray-500 text-sm mb-2">{coach.experience} years experience</p>
+                <p className="text-sm text-gray-700 italic mb-3">"{coach.bio}"</p>
                 <button
-                  className="mt-4 bg-[#087E8B] text-white px-4 py-2 rounded hover:bg-[#065d64] flex items-center gap-2"
                   onClick={() => setBookCoach(coach)}
+                  className="w-full bg-[#087E8B] text-white py-2 rounded hover:bg-[#065d64] transition duration-300"
                 >
-                  <CalendarDaysIcon className="w-4 h-4" />
-                  Book Session
+                  Book a Session
                 </button>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
+
+      {bookCoach && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
+            <h3 className="text-xl font-semibold text-center text-[#087E8B] mb-4">
+              Book Session with {bookCoach.name}
+            </h3>
+            <form onSubmit={(e) => handleBooking(e, bookCoach.id)}>
+              <input
+                type="text"
+                name="fullName"
+                placeholder="Your Full Name"
+                className="w-full mb-4 p-2 border rounded"
+                required
+              />
+              <input
+                type="email"
+                name="email"
+                placeholder="Your Email"
+                className="w-full mb-4 p-2 border rounded"
+                required
+              />
+              <input
+                type="date"
+                name="date"
+                className="w-full mb-4 p-2 border rounded"
+                required
+              />
+              <textarea
+                name="notes"
+                placeholder="Any notes or goals for the session (optional)"
+                className="w-full mb-4 p-2 border rounded"
+              ></textarea>
+              <div className="flex justify-between">
+                <button
+                  type="button"
+                  onClick={() => setBookCoach(null)}
+                  className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-[#087E8B] text-white px-4 py-2 rounded hover:bg-[#065d64] transition duration-300"
+                  disabled={loading}
+                >
+                  {loading ? "Booking..." : "Confirm Booking"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <Footer />
-
-      {/* Register Coach Modal */}
-      {showRegister && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-4">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative">
-            <button
-              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
-              onClick={() => setShowRegister(false)}
-            >
-              <XMarkIcon className="w-6 h-6" />
-            </button>
-            <h2 className="text-xl font-bold mb-4">Register as a Coach</h2>
-            <form className="space-y-4">
-              <input type="text" placeholder="Full Name" className="w-full border rounded px-3 py-2" />
-              <input type="text" placeholder="Specialty" className="w-full border rounded px-3 py-2" />
-              <input type="text" placeholder="Experience (e.g. 3 years)" className="w-full border rounded px-3 py-2" />
-              <textarea placeholder="Short Bio" className="w-full border rounded px-3 py-2" rows="3" />
-              <button className="w-full bg-[#087E8B] text-white py-2 rounded hover:bg-[#065d64]">
-                Submit Registration
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Book Session Modal */}
-      {bookCoach && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-4">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative">
-            <button
-              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
-              onClick={() => setBookCoach(null)}
-            >
-              <XMarkIcon className="w-6 h-6" />
-            </button>
-            <h2 className="text-xl font-bold mb-4">Book Session with {bookCoach.name}</h2>
-            <form className="space-y-4">
-              <input type="text" placeholder="Your Full Name" className="w-full border rounded px-3 py-2" />
-              <input type="email" placeholder="Your Email" className="w-full border rounded px-3 py-2" />
-              <input type="date" className="w-full border rounded px-3 py-2" />
-              <textarea placeholder="Goals / Notes (optional)" className="w-full border rounded px-3 py-2" rows="3" />
-              <button className="w-full bg-[#087E8B] text-white py-2 rounded hover:bg-[#065d64]">
-                Confirm Booking
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   );
-}
+};
+
+export default Coaches;

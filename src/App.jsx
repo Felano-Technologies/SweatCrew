@@ -5,14 +5,18 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Signup               from './pages/Signup'
 import Login                from './pages/Login'
 import Dashboard            from './pages/Dashboard'
-import LogWorkout           from './pages/LogWorkout'
 import PersonalizeProfile   from './pages/PersonalizeProfile'
 import LandingPage         from './pages/LandingPage'
 import Coaches              from './pages/Coaches'
 import Challenges              from './pages/Challenges'
+import TrackProgress              from './pages/TrackProgress'
+import Community              from './pages/Community'
+import { Toaster } from "react-hot-toast";
 
 export default function App() {
   return (
+    <>
+      <Toaster position="top-center" />
     <Router>
       <AuthProvider>
         <Routes>
@@ -20,14 +24,6 @@ export default function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/login"  element={<Login />} />
 
-          <Route
-            path="/log-workout"
-            element={
-              <ProtectedRoute>
-                <LogWorkout />
-              </ProtectedRoute>
-            }
-          />
 
           <Route
             path="/personalize-profile"
@@ -64,8 +60,27 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/track"
+            element={
+              <ProtectedRoute>
+                <TrackProgress />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/community"
+            element={
+              <ProtectedRoute>
+                <Community />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </AuthProvider>
     </Router>
+    </>
   )
 }

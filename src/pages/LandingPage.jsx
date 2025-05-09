@@ -25,11 +25,12 @@ export default function LandingPage() {
                 the fitness revolution.
               </p>
 
-              <button className="mt-6 bg-[#087E8B] hover:bg-[#56666B] text-white px-6 py-3 rounded-xl text-lg font-semibold shadow-md transition">
-                <a href="/signup">
-                Start Your Journey 💪
-                </a>
-              </button>
+              <a href="/signup">
+                <button className="mt-6 bg-[#087E8B] hover:bg-[#56666B] text-white px-6 py-3 rounded-xl text-lg font-semibold shadow-md transition">
+                  Start Your Journey 💪
+                </button>    
+              </a>
+
             </div>
 
             {/* Right Visual */}
@@ -154,7 +155,7 @@ export default function LandingPage() {
                 Get Started
               </a>
               <a
-                href="/#coaches"
+                href="/coaches"
                 className="border border-white text-white px-6 py-3 rounded-xl font-semibold hover:bg-white hover:text-[#087E8B] transition"
               >
                 Talk to a Coach
