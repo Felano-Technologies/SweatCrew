@@ -94,7 +94,7 @@ export default function Navbar() {
                 </button>
               </>
             ) : (
-              <Link to="/login" className="text-gray-700 hover:text-[#087E8B] text-sm font-medium">
+              <Link to="/" className="text-gray-700 hover:text-[#087E8B] text-sm font-medium">
                 Login
               </Link>
             )}

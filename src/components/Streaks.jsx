@@ -8,28 +8,50 @@ export default function Streaks({ workouts }) {
     const dates = Array.from(
       new Set(
         workouts.map(w =>
-          w.createdAt instanceof Date
-            ? w.createdAt
-            : new Date(w.createdAt)
+          w.createdAt instanceof Date ? w.createdAt : new Date(w.createdAt)
         )
       )
-    ).sort((a, b) => b - a)
-    let curr = 0, longest = 0, prev = null
-    dates.forEach((date, i) => {
-      if (i === 0) {
-        curr = differenceInCalendarDays(new Date(), date) === 0 ? 1 : 0
-        longest = 1
-        prev = date
-        return
+    ).sort((a, b) => a - b) // Sort oldest to newest
+  
+    if (dates.length === 0) return { currentStreak: 0, longestStreak: 0 }
+  
+    let longest = 1
+    let current = 1
+    let tempStreak = 1
+  
+    for (let i = 1; i < dates.length; i++) {
+      const diff = differenceInCalendarDays(dates[i], dates[i - 1])
+      if (diff === 1) {
+        tempStreak++
+      } else if (diff > 1) {
+        longest = Math.max(longest, tempStreak)
+        tempStreak = 1
       }
-      const diff = differenceInCalendarDays(prev, date)
-      if (diff === 1) curr++
-      else return
-      longest = Math.max(longest, i + 1)
-      prev = date
-    })
-    return { currentStreak: curr, longestStreak: longest }
+    }
+  
+    longest = Math.max(longest, tempStreak)
+  
+    const daysSinceLast = differenceInCalendarDays(new Date(), dates[dates.length - 1])
+    const isToday = daysSinceLast === 0
+    const isYesterday = daysSinceLast === 1
+  
+    if (isToday || isYesterday) {
+      current = 1
+      for (let i = dates.length - 1; i > 0; i--) {
+        const diff = differenceInCalendarDays(dates[i], dates[i - 1])
+        if (diff === 1) {
+          current++
+        } else {
+          break
+        }
+      }
+    } else {
+      current = 0
+    }
+  
+    return { currentStreak: current, longestStreak: longest }
   }, [workouts])
+  
 
   const pct = longestStreak ? (currentStreak / longestStreak) * 100 : 0
 
