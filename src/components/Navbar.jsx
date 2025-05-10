@@ -78,23 +78,20 @@ export default function Navbar() {
 
       {/* Mobile Dropdown */}
       {isOpen && (
-        <div className="md:hidden bg-white px-4 pt-2 pb-4 shadow-md">
-          <div className="flex flex-col space-y-2">
+        <div className="md:hidden bg-white px-4 pt-4 pb-4 shadow-md">
+          <div className="flex flex-col space-y-3">
             <NavLinks />
             {user ? (
               <>
-                {/* <Link to="/profile" className="text-gray-700 hover:text-[#087E8B] text-sm font-medium">
-                  My Profile
-                </Link> */}
                 <button
                   onClick={handleLogout}
-                  className="text-left text-sm text-red-600 hover:text-red-800"
+                  className="text-left text-md text-red-600 hover:text-red-800"
                 >
                   Logout
                 </button>
               </>
             ) : (
-              <Link to="/" className="text-gray-700 hover:text-[#087E8B] text-sm font-medium">
+              <Link to="/login" className="text-gray-700 hover:text-[#087E8B] text-md font-medium">
                 Login
               </Link>
             )}
@@ -106,7 +103,6 @@ export default function Navbar() {
 }
 
 function NavLinks() {
-
   const [user, setUser] = useState(null);
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -115,24 +111,24 @@ function NavLinks() {
 
     return () => unsubscribe();
   }, []);
+  
   return (
     <>
-    {user ? (
-      <Link to="/dashboard" className="text-gray-700 hover:text-[#087E8B] text-sm font-medium">
-        Dashboard
-      </Link>
-    ) : null}
-
-      <Link to="/coaches" className="text-gray-700 hover:text-[#087E8B] text-sm font-medium">
+      {user && (
+        <Link to="/dashboard" className="text-gray-700 hover:text-[#087E8B] text-md font-medium">
+          Dashboard
+        </Link>
+      )}
+      <Link to="/coaches" className="text-gray-700 hover:text-[#087E8B] text-md font-medium">
         Get a Coach
       </Link>
-      <Link to="/challenges" className="text-gray-700 hover:text-[#087E8B] text-sm font-medium">
+      <Link to="/challenges" className="text-gray-700 hover:text-[#087E8B] text-md font-medium">
         Challenges
       </Link>
-      <Link to="/track" className="text-gray-700 hover:text-[#087E8B] text-sm font-medium">
+      <Link to="/track" className="text-gray-700 hover:text-[#087E8B] text-md font-medium">
         Track Progress
       </Link>
-      <Link to="/community" className="text-gray-700 hover:text-[#087E8B] text-sm font-medium">
+      <Link to="/community" className="text-gray-700 hover:text-[#087E8B] text-md font-medium">
         Join a Crew
       </Link>
     </>

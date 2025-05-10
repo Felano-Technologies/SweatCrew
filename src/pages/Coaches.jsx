@@ -10,6 +10,7 @@ import { db } from "../firebase";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import toast from "react-hot-toast";
+import logoImage from "../assets/images/logo.png";
 
 const Coaches = () => {
   const [coaches, setCoaches] = useState([]);
@@ -26,7 +27,6 @@ const Coaches = () => {
   const [bookCoach, setBookCoach] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const defaultImage = "https://i.imgur.com/rs5KZyz.png";
 
   useEffect(() => {
     const q = query(collection(db, "coaches"), orderBy("name"));
@@ -166,13 +166,13 @@ const Coaches = () => {
             {coaches.map((coach) => (
               <div key={coach.id} className="bg-white rounded-lg shadow-md p-6 text-center">
                 <img
-                  src={coach.image || defaultImage}
+                  src={coach.image || logoImage}
                   alt={coach.name}
                   className="w-24 h-24 rounded-full object-cover mx-auto mb-4"
                 />
                 <h4 className="text-xl font-bold text-gray-800">{coach.name}</h4>
                 <p className="text-gray-600">{coach.specialty}</p>
-                <p className="text-gray-500 text-sm mb-2">{coach.experience} years experience</p>
+                <p className="text-gray-500 text-sm mb-2">{coach.experience} year(s) experience</p>
                 <p className="text-sm text-gray-700 italic mb-3">"{coach.bio}"</p>
                 <button
                   onClick={() => setBookCoach(coach)}

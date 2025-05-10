@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { db, auth } from "../firebase";
-import { collection, addDoc, onSnapshot, query, orderBy, Timestamp, updateDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  orderBy,
+  Timestamp,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
-import { User, Camera, MessageCircle, Plus } from "lucide-react"; 
+import { User, Camera, MessageCircle, Plus, X } from "lucide-react"; // <- X icon added
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
@@ -13,7 +22,9 @@ const JoinACrew = () => {
   const [posts, setPosts] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [selectedPost, setSelectedPost] = useState(null);
-  const [newCrewName, setNewCrewName] = useState(""); // New crew name for creating a crew
+  const [newCrewName, setNewCrewName] = useState("");
+  const [joinedCrewId, setJoinedCrewId] = useState(null); // Track which crew was joined
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -23,7 +34,6 @@ const JoinACrew = () => {
   }, []);
 
   useEffect(() => {
-    // Fetching crews from Firestore
     const q = query(collection(db, "crews"));
     onSnapshot(q, (snapshot) => {
       setCrews(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
@@ -32,11 +42,7 @@ const JoinACrew = () => {
 
   useEffect(() => {
     if (user) {
-      // Fetching posts based on selected crew
-      const q = query(
-        collection(db, "posts"),
-        orderBy("timestamp", "desc")
-      );
+      const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
       onSnapshot(q, (snapshot) => {
         setPosts(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
       });
@@ -57,7 +63,7 @@ const JoinACrew = () => {
 
     try {
       await addDoc(collection(db, "posts"), {
-        userId: user.uid,
+        userId: user.email,
         content: newPost.content,
         crew: newPost.crew,
         imageUrl: newPost.imageUrl,
@@ -87,34 +93,33 @@ const JoinACrew = () => {
 
   const handleCrewJoin = async (crewId) => {
     try {
-      // Add user to the crew (update the user's data to include the crewId)
       const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, {
         crew: crewId,
       });
+      setJoinedCrewId(crewId); // Update the joined crew in state
     } catch (error) {
       console.error("Error joining crew: ", error);
     }
   };
+  
 
   const handleCrewCreate = async () => {
     if (newCrewName.trim() === "") return;
 
     try {
-      // Create a new crew in Firestore
       const crewRef = await addDoc(collection(db, "crews"), {
         name: newCrewName,
-        members: [user.uid], // Add the creator as the first member
+        members: [user.uid],
         createdAt: Timestamp.now(),
       });
 
-      // Also add this crew to the user's data
       const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, {
-        crew: crewRef.id, // Associate the user with the newly created crew
+        crew: crewRef.id,
       });
 
-      setNewCrewName(""); // Reset the crew name field
+      setNewCrewName("");
     } catch (error) {
       console.error("Error creating crew: ", error);
     }
@@ -126,11 +131,9 @@ const JoinACrew = () => {
       <div className="max-w-4xl mx-auto p-4 pt-24">
         <h2 className="text-2xl font-bold text-[#087E8B] mb-6">Join a Crew</h2>
 
-        {/* Crew Management Section */}
         <div className="bg-white p-6 rounded-xl shadow mb-8">
           <h3 className="text-xl font-semibold mb-4">Create or Join a Crew</h3>
-          
-          {/* Create Crew */}
+
           <div className="flex items-center space-x-4 mb-6">
             <input
               type="text"
@@ -147,24 +150,27 @@ const JoinACrew = () => {
             </button>
           </div>
 
-          {/* Join Crew */}
           <div>
             <h4 className="font-semibold text-lg mb-2">Available Crews</h4>
             {crews.map((crew) => (
-              <div key={crew.id} className="flex justify-between items-center mb-4 p-4 bg-gray-100 rounded-lg">
+              <div
+                key={crew.id}
+                className="flex justify-between items-center mb-4 p-4 bg-gray-100 rounded-lg"
+              >
                 <p>{crew.name}</p>
                 <button
                   onClick={() => handleCrewJoin(crew.id)}
-                  className="bg-[#087E8B] text-white py-1 px-4 rounded hover:bg-[#066f7c]"
+                  className={`py-1 px-4 rounded text-white ${joinedCrewId === crew.id ? 'bg-green-600' : 'bg-[#087E8B] hover:bg-[#066f7c]'}`}
+                  disabled={joinedCrewId === crew.id}
                 >
-                  Join
+                  <i>Joined</i>
                 </button>
+
               </div>
             ))}
           </div>
         </div>
 
-        {/* Post Form */}
         {user && (
           <div className="bg-white p-6 rounded-xl shadow mb-8">
             <h3 className="text-xl font-semibold mb-4">Create a Post</h3>
@@ -221,7 +227,6 @@ const JoinACrew = () => {
           </div>
         )}
 
-        {/* Posts Feed */}
         <div>
           {posts.map((post) => (
             <div
@@ -237,7 +242,13 @@ const JoinACrew = () => {
                 </div>
               </div>
               <p className="text-lg mb-4">{post.content}</p>
-              {post.imageUrl && <img src={post.imageUrl} alt="Post" className="w-full h-64 object-cover rounded-xl" />}
+              {post.imageUrl && (
+                <img
+                  src={post.imageUrl}
+                  alt="Post"
+                  className="w-full h-64 object-cover rounded-xl"
+                />
+              )}
               <div className="flex items-center mt-4 text-[#087E8B]">
                 <MessageCircle size={20} /> <span className="ml-2">Comments</span>
               </div>
@@ -245,7 +256,6 @@ const JoinACrew = () => {
           ))}
         </div>
 
-        {/* Comments on Post */}
         {selectedPost && (
           <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-xl shadow-xl w-11/12 max-w-md relative">
@@ -273,21 +283,17 @@ const JoinACrew = () => {
                   </button>
                 </form>
 
-                {/* Fetch Comments for this post */}
+                {/* Placeholder for comments - assumes post data has 'comments' field */}
                 <div>
-                  {selectedPost && (
-                    <div>
-                      {selectedPost.comments?.map((comment) => (
-                        <div key={comment.id} className="flex items-start space-x-4 mb-4">
-                          <User size={40} />
-                          <div>
-                            <p className="font-semibold">{comment.userId}</p>
-                            <p>{comment.content}</p>
-                          </div>
-                        </div>
-                      ))}
+                  {selectedPost.comments?.map((comment) => (
+                    <div key={comment.id} className="flex items-start space-x-4 mb-4">
+                      <User size={40} />
+                      <div>
+                        <p className="font-semibold">{comment.userId}</p>
+                        <p>{comment.content}</p>
+                      </div>
                     </div>
-                  )}
+                  ))}
                 </div>
               </div>
             </div>

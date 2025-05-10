@@ -55,6 +55,7 @@ export default function Dashboard() {
     return onDocSnapshot(userDoc, snap => {
       if (snap.exists()) setProfile(snap.data())
     })
+  
   }, [currentUser])
 
   useEffect(() => {
@@ -83,7 +84,7 @@ export default function Dashboard() {
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-10 pt-20">
         <h1 className="flex items-center text-3xl font-bold text-[#087E8B] space-x-2">
           <Home className="w-6 h-6" />
-          <span>Welcome back, {profile.displayName || 'Friend'}!</span>
+          <span>{currentUser.email}!</span>
         </h1>
 
         {error && (
